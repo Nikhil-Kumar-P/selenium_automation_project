@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  automation_project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    image: automation_project_builder:latest
+    command: mvn clean package -DskipTests
+
+  runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: automation_project_runtime:latest
+    depends_on:
+      - automation_project
+    environment:
+      - PROPERTIES_FILE=src/main/java/ObjectRepository/objectrepository.properties
+    command: ["java", "-jar", "/automation.project/target/automation.project-0.0.1-SNAPSHOT.jar"]
+
+volumes:
+  maven-repo:
+    external: false
